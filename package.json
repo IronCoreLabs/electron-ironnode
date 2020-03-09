@@ -1,0 +1,19 @@
+{
+  "name": "electron-ironnode",
+  "version": "1.0.0",
+  "main": "main.js",
+  "scripts": {
+    "start": "electron .",
+    "postinstall": "electron-build-env neon build @ironcorelabs/recrypt-node-binding --release && npm run moveBinary",
+    "moveBinary": "pushd ./node_modules/@ironcorelabs/recrypt-node-binding && mkdir -p ./bin-package && cp ./native/index.node ./bin-package/index.node && popd"
+  },
+  "devDependencies": {
+    "electron": "^8.0.3",
+    "electron-build-env": "^0.2.0",
+    "neon-cli": "^0.3.3"
+  },
+  "dependencies": {
+    "@ironcorelabs/ironnode": "^0.8.0",
+    "@ironcorelabs/recrypt-node-binding": "github:ironcorelabs/recrypt-node-binding#0.7.1"
+  }
+}
