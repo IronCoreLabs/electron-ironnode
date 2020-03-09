@@ -18,11 +18,11 @@ Read below for a in-depth guide for how this repo is setup and the steps require
 
 IronNode relies on the [`recrypt-node-binding`](https://github.com/IronCoreLabs/recrypt-node-binding) library which is a native Node module written in Rust. This library is pre-compiled for various OS/Node version combinations to make it work for most Node projects. When a normal Node project adds IronNode as a dependency, a pre-compiled binary of the `recrypt-node-binding` dependency is pulled into the project for the OS/Node version the developer is on. Usually this step is invisible to the developer as it happens automatically during an `npm install`. In fact, [the source](https://unpkg.com/browse/@ironcorelabs/recrypt-node-binding@0.7.1/) for the `recrypt-node-binding` is little more than just configuration of where to pull the pre-compiled from and how to include it.
 
-Unfortunately Electron uses a custom version of V8 [as described here](https://www.electronjs.org/docs/tutorial/using-native-node-modules) and therefore the binaries we prebuild for the `recrypt-node-binding` won't work for various versions of Electron. The common recommendation for how to make this work is to re-compile the native module library from source for the version of Electron being used. This is possible with the `recrypt-node-binding` library, but takes a little bit of work to get it functional.
+Unfortunately Electron uses a custom version of V8 [as described here](https://www.electronjs.org/docs/tutorial/using-native-node-modules) and therefore the binaries we prebuilt for the `recrypt-node-binding` won't work for various versions of Electron. The common recommendation for how to make this work is to re-compile the native module library from source for the version of Electron being used. This is possible with the `recrypt-node-binding` library, but takes a little bit of work to get it functional.
 
 ## Adding IronNode as a Dependency
 
-There's two issues with being able to recompile the `recrypt-node-binding` dependency from source for an Electron project. First, the raw Rust source isn't published to NPM. As mentioned above, the `recrypt-node-binding` source that is published to NPM is little more than configuration. Second, IronNode expects the resulting binary to be placed into a specific location on the file system when it is `require`d into Node source code. Both of these problems can be fixed with a few changes to dependency locations and NPM scripts.
+There's two issues with being able to recompile the `recrypt-node-binding` dependency from source for an Electron project. First, the raw Rust source isn't published to NPM. As mentioned above, the `recrypt-node-binding` source that is published to NPM is little more than configuration. This means that there is no source to rebuild from when depending on the `recrypt-node-binding` dependency from NPM. Second, IronNode expects the resulting binary to be placed into a specific location on the file system when it is `require`d into Node source code. When compiling from source directly, the resulting binary isn't put into the expected location. Both of these problems can be fixed with a few changes to dependency locations and NPM scripts.
 
 ### Prerequisites
 
@@ -50,7 +50,7 @@ These two dependencies will allow us to build `recrypt-node-binding` from source
 
 ### Install Scripts
 
-Now that our dependencies are all setup, we need to add some NPM scripts that will perform the compilation when we run an `npm install`. These scripts have two goals: compile the Rust library from source, and move the resulting binary to the proper place within the `node_modules` directory.
+Now that our dependencies are all setup, we need to add some NPM scripts that will perform the compilation when we run an `npm install`. These scripts have two goals: compile the Rust library from source and move the resulting binary to the proper place within the `node_modules` directory.
 
 Add the following lines under your `package.json` `scripts` section
 
@@ -59,7 +59,7 @@ Add the following lines under your `package.json` `scripts` section
 "moveBinary": "pushd ./node_modules/@ironcorelabs/recrypt-node-binding && mkdir -p ./bin-package && cp ./native/index.node ./bin-package/index.node && popd"
 ```
 
-The first script, `postinstall` will run everytime the `npm install` command is run and finished. It rebuilds the `recrypt-node-binding` dependency for the version of Electron being used in the project. The `moveBinary` script then takes the resulting binary that was compiled and moves it to the proper place. The first time that `npm install` is run after adding these dependencies, the Rust comilation will run, which might take a little while. But once that is done, subsequent `npm install` runs should just check that the binary was already generated and do nothing.
+The first script, `postinstall`, will run everytime the `npm install` command is run and completes. It rebuilds the `recrypt-node-binding` dependency for the version of Electron being used in the project. The `moveBinary` script then takes the resulting binary that was compiled and moves it to the proper place. The first time that `npm install` is run after adding these dependencies, the Rust comilation will run, which might take a little while. But once that is done, subsequent `npm install` runs should just check that the binary was already generated and do nothing.
 
 ### Including IronNode
 
