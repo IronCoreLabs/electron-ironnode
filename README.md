@@ -2,6 +2,8 @@
 
 Proof of concept that shows how to use [IronNode](https://github.com/IronCoreLabs/ironnode) within an Electron app. The repo contains an example Electron project using IronNode and this README explains the problem and a step-by-step solution for how to make the Electron and IronNode play together.
 
+> This repo has been archived and won't be receiving regular updates. It may still work as is when you encounter it. If you need an up to date version of what's in this repo, contact us at info@ironcorelabs.com.
+
 ## Quickstart
 
 This repo is a bare-bones Electron app that when opened, initializes the IronNode SDK, create a group, display the details of the group, and then immediately delete the group. In order to test this out first make sure you have the Rust toolchain installed on your machine. Then do the following:
